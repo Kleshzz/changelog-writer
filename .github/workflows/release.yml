@@ -16,13 +16,29 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Move floating tag
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      - name: Bump version in package.json
+        env:
+          TAG: ${{ github.ref_name }}
         run: |
+          VERSION="${TAG#v}"
+          npm version "$VERSION" --no-git-tag-version
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          MAJOR=$(echo ${{ github.ref_name }} | cut -d. -f1)
-          git tag -f $MAJOR ${{ github.ref_name }}
-          git push origin $MAJOR --force
+          git add package.json package-lock.json
+          git commit -m "chore(dev): bump version to $VERSION"
+          git push origin HEAD:main
+
+      - name: Move floating tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          MAJOR=$(echo "$TAG" | cut -d. -f1)
+          git tag -f "$MAJOR" "$TAG"
+          git push origin "$MAJOR" --force
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
