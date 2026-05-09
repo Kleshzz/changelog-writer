@@ -1,0 +1,13 @@
+name: 'Generate Changelog'
+description: 'Generate changelog from conventional commits between tags'
+inputs:
+  tag:
+    description: 'Target tag'
+    required: true
+outputs:
+  changelog:
+    description: 'Generated changelog'
+    value: ${{ steps.generate.outputs.changelog }}
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
