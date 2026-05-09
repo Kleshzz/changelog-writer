@@ -56,11 +56,17 @@ async function run(): Promise<void> {
 
     // If no previous tag found, git log <tag> will show all history up to that tag
     const range = prevTag ? `${prevTag}..${tag}` : tag
+    const results = await Promise.all(
+      Object.entries(SECTIONS).map(async ([type, header]) => {
+        const lines = await getCommits(range, type)
+        return { lines, header }
+      })
+    )
+
     const sections: string[] = []
     let totalCommits = 0
 
-    for (const [type, header] of Object.entries(SECTIONS)) {
-      const lines = await getCommits(range, type)
+    for (const { lines, header } of results) {
       if (lines.length > 0) {
         totalCommits += lines.length
         sections.push(`${header}\n${lines.join('\n')}`)
