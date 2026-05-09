@@ -5,6 +5,8 @@ import * as os from 'os'
 import * as path from 'path'
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'changelog-test-'))
+const githubOutput = path.join(dir, 'github_output')
+fs.writeFileSync(githubOutput, '')
 
 function git(cmd: string): void {
   execSync(`git ${cmd}`, { cwd: dir, stdio: 'pipe' })
@@ -25,24 +27,62 @@ commit('fix: correct typo')
 commit('feat(dev): internal tooling')
 git('tag v1.1.0')
 
+const debugLog = execSync('git log v1.0.0..v1.1.0 --pretty=format:"%s (%h)"', { cwd: dir }).toString()
+console.log('Git log output:')
+console.log(debugLog)
+
+const debugFix = execSync(
+  'git log v1.0.0..v1.1.0 --pretty=format:"%s (%h)" --extended-regexp --grep="^fix(\\(|:|!)"',
+  { cwd: dir }
+).toString()
+console.log('Fix grep output:')
+console.log(debugFix)
+
 // Run
-const outputFile = path.join(dir, 'changelog.md')
 const env = {
   ...process.env,
   INPUT_TAG: 'v1.1.0',
-  INPUT_OUTPUT_FILE: outputFile,
-  'INPUT_OUTPUT-FILE': outputFile,
   GITHUB_WORKSPACE: dir,
-  GITHUB_OUTPUT: '/dev/null',
+  GITHUB_OUTPUT: githubOutput,
 }
 
 execSync(`node ${path.join(__dirname, '../dist/index.js')}`, { cwd: dir, env, stdio: 'inherit' })
 
-const changelog = fs.readFileSync(outputFile, 'utf8')
+function parseGithubOutput(content: string): Record<string, string> {
+  const result: Record<string, string> = {}
+  const lines = content.split('\n')
+  let i = 0
+  while (i < lines.length) {
+    const header = lines[i].match(/^(\w+)<<(.+)$/)
+    if (header) {
+      const [, key, delimiter] = header
+      const valueLines: string[] = []
+      i++
+      while (i < lines.length && lines[i] !== delimiter) {
+        valueLines.push(lines[i])
+        i++
+      }
+      result[key] = valueLines.join('\n')
+    }
+    i++
+  }
+  return result
+}
+
+const outputContent = fs.readFileSync(githubOutput, 'utf8')
+const outputs = parseGithubOutput(outputContent)
+const changelog = outputs['changelog']
+
+if (!changelog) {
+  console.error('FAIL: changelog output not found in GITHUB_OUTPUT')
+  console.error('GITHUB_OUTPUT contents:', outputContent)
+  process.exit(1)
+}
 
 const assert = (cond: boolean, msg: string): void => {
   if (!cond) {
     console.error(`FAIL: ${msg}`)
+    console.error('Changelog was:', changelog)
     process.exit(1)
   }
   console.log(`OK: ${msg}`)
