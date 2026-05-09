@@ -30,6 +30,7 @@ const outputFile = path.join(dir, 'changelog.md')
 const env = {
   ...process.env,
   INPUT_TAG: 'v1.1.0',
+  INPUT_OUTPUT_FILE: outputFile,
   'INPUT_OUTPUT-FILE': outputFile,
   GITHUB_WORKSPACE: dir,
   GITHUB_OUTPUT: '/dev/null',
