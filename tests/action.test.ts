@@ -27,19 +27,6 @@ commit('fix: correct typo')
 commit('feat(dev): internal tooling')
 git('tag v1.1.0')
 
-const debugLog = execSync('git log v1.0.0..v1.1.0 --pretty=format:"%s (%h)"', {
-  cwd: dir,
-}).toString()
-console.log('Git log output:')
-console.log(debugLog)
-
-const debugFix = execSync(
-  'git log v1.0.0..v1.1.0 --pretty=format:"%s (%h)" --extended-regexp --grep="^fix(\\(|:|!)"',
-  { cwd: dir }
-).toString()
-console.log('Fix grep output:')
-console.log(debugFix)
-
 // Run
 const env = {
   ...process.env,
