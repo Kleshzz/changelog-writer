@@ -1,5 +1,8 @@
 name: 'Generate Changelog'
 description: 'Generate changelog from conventional commits between tags'
+branding:
+  icon: 'file-text'
+  color: 'blue'
 inputs:
   tag:
     description: 'Target tag'

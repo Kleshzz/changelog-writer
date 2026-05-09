@@ -6,6 +6,8 @@ GitHub Action that generates a changelog from conventional commits between tags.
 
 ```yaml
 - uses: actions/checkout@v6
+  with:
+    fetch-depth: 0 # required for git history
 
 - uses: Kleshzz/changelog-writer@v1
   id: changelog
