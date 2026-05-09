@@ -6,16 +6,22 @@ on:
     paths:
       - 'src/**'
       - 'dist/**'
+      - 'tests/**'
       - 'package*.json'
       - 'tsconfig.json'
+      - 'eslint.config.mjs'
+      - '.prettierrc'
       - '.github/workflows/ci.yml'
   pull_request:
     branches: [main]
     paths:
       - 'src/**'
       - 'dist/**'
+      - 'tests/**'
       - 'package*.json'
       - 'tsconfig.json'
+      - 'eslint.config.mjs'
+      - '.prettierrc'
       - '.github/workflows/ci.yml'
   workflow_dispatch:
 
@@ -36,16 +42,25 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Verify lockfile
+      - name: Audit
         run: npm audit --audit-level=high
 
       - name: Typecheck
-        run: npx tsc --noEmit
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
 
       - name: Build
         run: npm run build
 
+      - name: Test
+        run: npm test
+
       - name: Check dist is up to date
         run: |
           git diff --exit-code dist/index.js || \
-          (echo "::error::dist/index.js is out of date — run npm run build and commit" && exit 1)
+          (echo "::error::dist/index.js is out of date - run npm run build and commit" && exit 1)

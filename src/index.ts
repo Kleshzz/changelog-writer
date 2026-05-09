@@ -4,25 +4,30 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 const SECTIONS: Record<string, string> = {
-  feat:     '## Features',
-  fix:      '## Bug Fixes',
-  perf:     '## Performance',
+  feat: '## Features',
+  fix: '## Bug Fixes',
+  perf: '## Performance',
   refactor: '## Refactor',
-  style:    '## Style',
-  docs:     '## Docs',
+  style: '## Style',
+  docs: '## Docs',
 }
 
 async function getAllCommits(range: string): Promise<string[]> {
   const { stdout } = await getExecOutput(
     'git',
-    ['log', range, '--pretty=format:%s (%h)', '--extended-regexp',
-     `--grep=^(${Object.keys(SECTIONS).join('|')})(\\(|:|!)`],
+    [
+      'log',
+      range,
+      '--pretty=format:%s (%h)',
+      '--extended-regexp',
+      `--grep=^(${Object.keys(SECTIONS).join('|')})(\\(|:|!)`,
+    ],
     { silent: true }
   )
 
   return stdout
     .split('\n')
-    .map(line => line.trim())
+    .map((line) => line.trim())
     .filter(Boolean)
 }
 
@@ -61,8 +66,8 @@ async function run(): Promise<void> {
       const devRegex = new RegExp(`^${type}\\(dev\\)[!:]?`)
 
       const lines = allCommits
-        .filter(line => typeRegex.test(line) && !devRegex.test(line))
-        .map(line => {
+        .filter((line) => typeRegex.test(line) && !devRegex.test(line))
+        .map((line) => {
           const cleaned = line.replace(typeRegex, '')
           return '- ' + cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
         })
@@ -73,9 +78,7 @@ async function run(): Promise<void> {
       }
     }
 
-    const changelog = sections.length > 0
-      ? sections.join('\n\n')
-      : 'No changes.'
+    const changelog = sections.length > 0 ? sections.join('\n\n') : 'No changes.'
 
     const outputFile = core.getInput('output-file')
     if (outputFile) {

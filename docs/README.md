@@ -22,26 +22,26 @@ GitHub Action that generates a changelog from conventional commits between tags.
 ## Inputs
 
 | Name          | Required | Description                          |
-|---------------|----------|--------------------------------------|
+| ------------- | -------- | ------------------------------------ |
 | `tag`         | ✅       | Target tag to generate changelog for |
 | `output-file` |          | Path to write changelog file         |
 
 ## Outputs
 
-| Name        | Description               |
-|-------------|---------------------------|
-| `changelog` | Generated changelog text  |
+| Name        | Description              |
+| ----------- | ------------------------ |
+| `changelog` | Generated changelog text |
 
 ## Supported commit types
 
-| Prefix       | Section          |
-|--------------|------------------|
-| `feat`       | Features         |
-| `fix`        | Bug Fixes        |
-| `perf`       | Performance      |
-| `refactor`   | Refactor         |
-| `style`      | Style            |
-| `docs`       | Docs             |
+| Prefix     | Section     |
+| ---------- | ----------- |
+| `feat`     | Features    |
+| `fix`      | Bug Fixes   |
+| `perf`     | Performance |
+| `refactor` | Refactor    |
+| `style`    | Style       |
+| `docs`     | Docs        |
 
 Commits with `(dev)` scope are excluded (e.g. `feat(dev): ...`).
 
@@ -55,7 +55,6 @@ Commits with `(dev)` scope are excluded (e.g. `feat(dev): ...`).
 ### Bug Fixes
 
 - Fix crash on startup (i7j8k9l)
-
 
 ## Local build
 

@@ -8,12 +8,12 @@ updates:
     groups:
       actions-deps:
         patterns:
-          - "@actions/*"
+          - '@actions/*'
       dev-tools:
         patterns:
-          - "@vercel/ncc"
-          - "typescript"
-          - "@types/*"
+          - '@vercel/ncc'
+          - 'typescript'
+          - '@types/*'
 
   - package-ecosystem: github-actions
     directory: /

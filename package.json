@@ -11,7 +11,12 @@
     "url": "https://github.com/Kleshzz/changelog-writer/issues"
   },
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=dist/index.js --minify"
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=dist/index.js --minify",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "npm run build && npx -y ts-node tests/action.test.ts"
   },
   "dependencies": {
     "@actions/core": "^3.0.1",
@@ -19,7 +24,11 @@
   },
   "devDependencies": {
     "@types/node": "^25",
+    "@typescript-eslint/eslint-plugin": "^8",
+    "@typescript-eslint/parser": "^8",
+    "eslint": "^9",
     "esbuild": "^0.28.0",
+    "prettier": "^3",
     "typescript": "^6"
   }
 }
