@@ -36,14 +36,14 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Verify lockfile
+        run: npm audit --audit-level=high
+
       - name: Typecheck
         run: npx tsc --noEmit
 
       - name: Build
         run: npm run build
-      
-      - name: Verify lockfile
-        run: npm audit --audit-level=high
 
       - name: Check dist is up to date
         run: |
