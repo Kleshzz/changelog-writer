@@ -1,7 +1,15 @@
 {
-  "name": "changelog-action",
+  "private": true,
+  "name": "changelog-writer",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kleshzz/changelog-writer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Kleshzz/changelog-writer/issues"
+  },
   "scripts": {
     "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=dist/index.js --minify"
   },
