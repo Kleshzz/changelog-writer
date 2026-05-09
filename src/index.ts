@@ -48,8 +48,11 @@ async function run(): Promise<void> {
         { silent: true }
       )
       prevTag = stdout.trim()
-    } catch {}
+    } catch (error) {
+      core.debug(`No previous tag found, using full history: ${error}`)
+    }
 
+    // If no previous tag found, git log <tag> will show all history up to that tag
     const range = prevTag ? `${prevTag}..${tag}` : tag
     const sections: string[] = []
 
