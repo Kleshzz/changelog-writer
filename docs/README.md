@@ -1,4 +1,8 @@
-# changelog-writer
+# Changelog Writer Action
+
+![CI](https://github.com/Kleshzz/changelog-writer/actions/workflows/ci.yml/badge.svg)
+![Latest Release](https://img.shields.io/github/v/release/Kleshzz/changelog-writer)
+
 
 GitHub Action that generates a changelog from conventional commits between tags.
 
@@ -43,7 +47,15 @@ GitHub Action that generates a changelog from conventional commits between tags.
 | `style`    | Style       |
 | `docs`     | Docs        |
 
-Commits with `(dev)` scope are excluded (e.g. `feat(dev): ...`).
+### Commit Format
+
+We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+
+- `feat: add dark mode` — Standard feature
+- `feat(auth): support OAuth` — Feature with scope
+- `fix!: breaking change in API` — Breaking change (adds ⚠️)
+- `feat(dev): update dependencies` — Excluded from changelog via `(dev)` scope
+
 
 ## Example output
 
@@ -56,9 +68,27 @@ Commits with `(dev)` scope are excluded (e.g. `feat(dev): ...`).
 
 - Fix crash on startup (i7j8k9l)
 
-## Local build
+## Behavior & Edge Cases
+
+- **No matching commits**: If no commits match the supported types between tags, the output will be `No changes`.
+- **Tag not found**: If the specified `tag` (or the previous tag) cannot be found, the action will fail.
+
+
+## Local Development
 
 ```bash
+# Install dependencies
 npm install
+
+# Build the action bundle
 npm run build
+
+# Run the test suite
+npm test
+
+# Run linter
+npm run lint
+
+# Run type checking
+npm run typecheck
 ```
