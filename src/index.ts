@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import { getExecOutput } from '@actions/exec'
 import * as fs from 'fs'
+import * as path from 'path'
 
 const SECTIONS: Record<string, string> = {
   feat:     '## Features',
@@ -69,7 +70,14 @@ async function run(): Promise<void> {
 
     const outputFile = core.getInput('output-file')
     if (outputFile) {
-      fs.writeFileSync(outputFile, changelog)
+      const resolvedPath = path.resolve(outputFile)
+      const workspacePath = process.env['GITHUB_WORKSPACE'] || process.cwd()
+
+      if (!resolvedPath.startsWith(path.resolve(workspacePath))) {
+        throw new Error(`Output file path must be within the workspace: ${outputFile}`)
+      }
+
+      fs.writeFileSync(resolvedPath, changelog)
     }
 
     core.setOutput('changelog', changelog)
