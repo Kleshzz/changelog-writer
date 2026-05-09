@@ -3,13 +3,25 @@ name: CI
 on:
   push:
     branches: [main]
+    paths:
+      - 'src/**'
+      - 'dist/**'
+      - 'package*.json'
+      - 'tsconfig.json'
   pull_request:
     branches: [main]
+    paths:
+      - 'src/**'
+      - 'dist/**'
+      - 'package*.json'
+      - 'tsconfig.json'
   workflow_dispatch:
 
 jobs:
   ci:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v6
