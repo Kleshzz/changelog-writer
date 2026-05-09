@@ -8,6 +8,7 @@ on:
       - 'dist/**'
       - 'package*.json'
       - 'tsconfig.json'
+      - '.github/workflows/ci.yml'
   pull_request:
     branches: [main]
     paths:
@@ -15,6 +16,7 @@ on:
       - 'dist/**'
       - 'package*.json'
       - 'tsconfig.json'
+      - '.github/workflows/ci.yml'
   workflow_dispatch:
 
 jobs:
@@ -39,6 +41,9 @@ jobs:
 
       - name: Build
         run: npm run build
+      
+      - name: Verify lockfile
+        run: npm audit --audit-level=high
 
       - name: Check dist is up to date
         run: |
