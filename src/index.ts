@@ -12,10 +12,11 @@ const SECTIONS: Record<string, string> = {
   docs:     '## Docs',
 }
 
-async function getCommits(range: string, type: string): Promise<string[]> {
+async function getAllCommits(range: string): Promise<string[]> {
   const { stdout } = await getExecOutput(
     'git',
-    ['log', range, '--pretty=format:%s (%h)', '--extended-regexp', `--grep=^${type}(\\(|:|!)`],
+    ['log', range, '--pretty=format:%s (%h)', '--extended-regexp',
+     `--grep=^(${Object.keys(SECTIONS).join('|')})(\\(|:|!)`],
     { silent: true }
   )
 
@@ -23,12 +24,6 @@ async function getCommits(range: string, type: string): Promise<string[]> {
     .split('\n')
     .map(line => line.trim())
     .filter(Boolean)
-    .filter(line => !new RegExp(`^${type}\\(dev\\)[!:]?`).test(line))
-    .map(line => {
-      // Handle conventional commit prefix with optional scope and breaking change indicator (!)
-      const cleaned = line.replace(new RegExp(`^${type}(\\([^)]*\\))?!?: `), '')
-      return '- ' + cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
-    })
 }
 
 async function run(): Promise<void> {
@@ -56,17 +51,22 @@ async function run(): Promise<void> {
 
     // If no previous tag found, git log <tag> will show all history up to that tag
     const range = prevTag ? `${prevTag}..${tag}` : tag
-    const results = await Promise.all(
-      Object.entries(SECTIONS).map(async ([type, header]) => {
-        const lines = await getCommits(range, type)
-        return { lines, header }
-      })
-    )
+    const allCommits = await getAllCommits(range)
 
     const sections: string[] = []
     let totalCommits = 0
 
-    for (const { lines, header } of results) {
+    for (const [type, header] of Object.entries(SECTIONS)) {
+      const typeRegex = new RegExp(`^${type}(\\([^)]*\\))?!?: `)
+      const devRegex = new RegExp(`^${type}\\(dev\\)[!:]?`)
+
+      const lines = allCommits
+        .filter(line => typeRegex.test(line) && !devRegex.test(line))
+        .map(line => {
+          const cleaned = line.replace(typeRegex, '')
+          return '- ' + cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
+        })
+
       if (lines.length > 0) {
         totalCommits += lines.length
         sections.push(`${header}\n${lines.join('\n')}`)
