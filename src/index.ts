@@ -20,6 +20,8 @@ async function getAllCommits(range: string): Promise<string[]> {
       range,
       '--pretty=format:%s (%h)',
       '--extended-regexp',
+      // Matches conventional commit types followed by scope, colon, or breaking change (!)
+      // The \\( is escaped for TypeScript to pass \( to git (important for --extended-regexp)
       `--grep=^(${Object.keys(SECTIONS).join('|')})(\\(|:|!)`,
     ],
     { silent: true }
@@ -89,6 +91,7 @@ async function run(): Promise<void> {
         throw new Error(`Output file path must be within the workspace: ${outputFile}`)
       }
 
+      fs.mkdirSync(path.dirname(resolvedPath), { recursive: true })
       fs.writeFileSync(resolvedPath, changelog)
     }
 
