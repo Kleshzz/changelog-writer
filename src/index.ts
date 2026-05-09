@@ -23,9 +23,10 @@ async function getCommits(range: string, type: string): Promise<string[]> {
     .split('\n')
     .map(line => line.trim())
     .filter(Boolean)
-    .filter(line => !new RegExp(`^${type}\\(dev\\)`).test(line))
+    .filter(line => !new RegExp(`^${type}\\(dev\\)[!:]?`).test(line))
     .map(line => {
-      const cleaned = line.replace(new RegExp(`^${type}(\\([^)]*\\))?: `), '')
+      // Handle conventional commit prefix with optional scope and breaking change indicator (!)
+      const cleaned = line.replace(new RegExp(`^${type}(\\([^)]*\\))?!?: `), '')
       return '- ' + cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
     })
 }
