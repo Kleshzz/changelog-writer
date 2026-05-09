@@ -57,10 +57,12 @@ async function run(): Promise<void> {
     // If no previous tag found, git log <tag> will show all history up to that tag
     const range = prevTag ? `${prevTag}..${tag}` : tag
     const sections: string[] = []
+    let totalCommits = 0
 
     for (const [type, header] of Object.entries(SECTIONS)) {
       const lines = await getCommits(range, type)
       if (lines.length > 0) {
+        totalCommits += lines.length
         sections.push(`${header}\n${lines.join('\n')}`)
       }
     }
@@ -84,6 +86,8 @@ async function run(): Promise<void> {
     core.setOutput('changelog', changelog)
 
     core.info('Changelog generated successfully')
+    core.info(`Range: ${range}`)
+    core.info(`Sections: ${sections.length}, commits processed: ${totalCommits}`)
   } catch (error) {
     core.setFailed(error instanceof Error ? error.message : String(error))
   }
