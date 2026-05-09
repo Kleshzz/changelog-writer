@@ -7,6 +7,9 @@ inputs:
   tag:
     description: 'Target tag'
     required: true
+  output-file:
+    description: 'Path to write changelog file (optional)'
+    required: false
 outputs:
   changelog:
     description: 'Generated changelog'

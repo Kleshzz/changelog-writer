@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import { exec, getExecOutput } from '@actions/exec'
+import { getExecOutput } from '@actions/exec'
 import * as fs from 'fs'
 
 const SECTIONS: Record<string, string> = {
@@ -7,7 +7,6 @@ const SECTIONS: Record<string, string> = {
   fix:      '## Bug Fixes',
   perf:     '## Performance',
   refactor: '## Refactor',
-  debug:    '## Debug',
   style:    '## Style',
   docs:     '## Docs',
 }
@@ -15,7 +14,7 @@ const SECTIONS: Record<string, string> = {
 async function getCommits(range: string, type: string): Promise<string[]> {
   const { stdout } = await getExecOutput(
     'git',
-    ['log', range, '--pretty=format:%s (%h)', `--grep=^${type}`],
+    ['log', range, '--pretty=format:%s (%h)', '--extended-regexp', `--grep=^${type}(\\(|:|!)`],
     { silent: true }
   )
 
@@ -33,6 +32,13 @@ async function getCommits(range: string, type: string): Promise<string[]> {
 async function run(): Promise<void> {
   try {
     const tag = core.getInput('tag', { required: true })
+
+    try {
+      await getExecOutput('git', ['rev-parse', '--verify', tag], { silent: true })
+    } catch {
+      core.setFailed(`Tag "${tag}" not found in repository`)
+      return
+    }
 
     let prevTag = ''
     try {
@@ -58,7 +64,10 @@ async function run(): Promise<void> {
       ? sections.join('\n\n')
       : 'No changes.'
 
-    fs.writeFileSync('changelog.md', changelog)
+    const outputFile = core.getInput('output-file')
+    if (outputFile) {
+      fs.writeFileSync(outputFile, changelog)
+    }
 
     core.setOutput('changelog', changelog)
 

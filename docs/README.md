@@ -13,6 +13,7 @@ GitHub Action that generates a changelog from conventional commits between tags.
   id: changelog
   with:
     tag: v1.2.3
+    output-file: changelog.md # optional
 
 - name: Create release
 - run: echo "${{ steps.changelog.outputs.changelog }}"
@@ -30,9 +31,10 @@ jobs:
 
 ## Inputs
 
-| Name  | Required | Description          |
-|-------|----------|----------------------|
-| `tag` | ✅       | Target tag to generate changelog for |
+| Name          | Required | Description                          |
+|---------------|----------|--------------------------------------|
+| `tag`         | ✅       | Target tag to generate changelog for |
+| `output-file` |          | Path to write changelog file         |
 
 ## Outputs
 
@@ -48,7 +50,6 @@ jobs:
 | `fix`        | Bug Fixes        |
 | `perf`       | Performance      |
 | `refactor`   | Refactor         |
-| `debug`      | Debug            |
 | `style`      | Style            |
 | `docs`       | Docs             |
 
