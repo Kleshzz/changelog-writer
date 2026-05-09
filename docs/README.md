@@ -16,17 +16,7 @@ GitHub Action that generates a changelog from conventional commits between tags.
     output-file: changelog.md # optional
 
 - name: Create release
-- run: echo "${{ steps.changelog.outputs.changelog }}"
-```
-
-## As a reusable workflow input
-
-```yaml
-jobs:
-  changelog:
-    uses: ./.github/workflows/changelog.yml
-    with:
-      tag: ${{ inputs.tag }}
+  run: echo "${{ steps.changelog.outputs.changelog }}"
 ```
 
 ## Inputs
