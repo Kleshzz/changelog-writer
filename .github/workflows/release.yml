@@ -40,8 +40,14 @@ jobs:
           git tag -f "$MAJOR" "$TAG"
           git push origin "$MAJOR" --force
 
+      - name: Generate Changelog
+        id: changelog
+        uses: ./
+        with:
+          tag: ${{ github.ref_name }}
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          generate_release_notes: true
+          body: ${{ steps.changelog.outputs.changelog }}
           make_latest: true
