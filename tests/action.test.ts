@@ -221,4 +221,43 @@ withTempDir('Empty range between tags', (dir, githubOutput) => {
   assert(changelog === 'No changes.', 'Output should be No changes.', changelog)
 })
 
+// 9. Whitespace-only output-file (should be ignored)
+withTempDir('Whitespace-only output-file', (dir, githubOutput) => {
+  commit(dir, 'feat: some feat')
+  git(dir, 'tag v1.0.0')
+
+  runAction(dir, {
+    INPUT_TAG: 'v1.0.0',
+    INPUT_OUTPUT_FILE: '   ',
+    GITHUB_WORKSPACE: dir,
+    GITHUB_OUTPUT: githubOutput,
+  })
+
+  const outputs = parseGithubOutput(fs.readFileSync(githubOutput, 'utf8'))
+  const changelog = outputs['changelog'] || ''
+
+  assert(changelog.includes('Some feat'), 'Changelog generated')
+  // If it wasn't ignored, it might have tried to write to a weird path and failed
+  // or we can check that no files were created except the expected ones
+  const files = fs.readdirSync(dir).filter((f) => f !== '.git' && f !== 'github_output')
+  assert(files.length === 0, 'No output file should be created for whitespace-only input', files.join(', '))
+})
+
+// 10. Tag with whitespace (should be trimmed)
+withTempDir('Tag with whitespace', (dir, githubOutput) => {
+  commit(dir, 'feat: some feat')
+  git(dir, 'tag v1.0.0')
+
+  runAction(dir, {
+    INPUT_TAG: '  v1.0.0  ',
+    GITHUB_WORKSPACE: dir,
+    GITHUB_OUTPUT: githubOutput,
+  })
+
+  const outputs = parseGithubOutput(fs.readFileSync(githubOutput, 'utf8'))
+  const changelog = outputs['changelog'] || ''
+
+  assert(changelog.includes('Some feat'), 'Changelog generated for trimmed tag')
+})
+
 console.log('\nAll tests passed!')

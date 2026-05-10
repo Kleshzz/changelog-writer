@@ -91,13 +91,13 @@ function generateChangelog(allCommits: string[]): {
 async function run(): Promise<void> {
   const workspacePath = path.resolve(process.env['GITHUB_WORKSPACE'] ?? process.cwd())
   try {
-    const tag = core.getInput('tag', { required: true })
+    const tag = core.getInput('tag', { required: true, trimWhitespace: true })
     const range = await resolveTagRange(tag)
     const allCommits = await getAllCommits(range)
 
     const { changelog, totalCommits, sectionsCount } = generateChangelog(allCommits)
 
-    const outputFile = core.getInput('output_file')
+    const outputFile = core.getInput('output_file', { trimWhitespace: true })
     if (outputFile) {
       const resolvedPath = path.resolve(outputFile)
 
