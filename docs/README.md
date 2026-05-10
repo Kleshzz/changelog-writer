@@ -16,7 +16,7 @@ GitHub Action that generates a changelog from conventional commits between tags.
 - uses: Kleshzz/changelog-writer@v1
   id: changelog
   with:
-    tag: v1.2.3
+    tag: ${{ github.ref_name }} # required for generated changelog
     output-file: changelog.md # optional
 
 - name: Create release
