@@ -57,3 +57,5 @@ jobs:
         with:
           body: ${{ steps.changelog.outputs.changelog }}
           make_latest: true
+          draft: false
+          fail_on_existing_release: false
