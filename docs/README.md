@@ -50,10 +50,10 @@ GitHub Action that generates a changelog from conventional commits between tags.
 
 We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
 
-- `feat: add dark mode` — Standard feature
-- `feat(auth): support OAuth` — Feature with scope
-- `fix!: breaking change in API` — Breaking change (adds ⚠️)
-- `feat(dev): update dependencies` — Excluded from changelog via `(dev)` scope
+- `feat: add dark mode` - Standard feature
+- `feat(auth): support OAuth` - Feature with scope
+- `fix!: breaking change in API` - Breaking change (adds ⚠️)
+- `feat(dev): update dependencies` - Excluded from changelog via `(dev)` scope
 
 ## Example output
 
