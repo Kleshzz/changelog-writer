@@ -8,7 +8,7 @@ import { git, commit, parseGithubOutput, assert, runAction } from './helpers'
  */
 function withTempDir(testName: string, fn: (dir: string, githubOutput: string) => void): void {
   console.log(`\n--- Running test: ${testName} ---`)
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'changelog-test-'))
+  const dir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'changelog-test-')))
   const githubOutput = path.join(dir, 'github_output')
   fs.writeFileSync(githubOutput, '')
 
@@ -186,7 +186,7 @@ withTempDir('Write to output-file', (dir, githubOutput) => {
   commit(dir, 'feat: some feat')
   git(dir, 'tag v1.0.0')
 
-  const outputFile = path.join(dir, 'CHANGELOG.md')
+  const outputFile = path.join(dir, 'subdir', 'CHANGELOG.md')
 
   runAction(dir, {
     INPUT_TAG: 'v1.0.0',
