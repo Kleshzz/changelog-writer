@@ -12,6 +12,8 @@ const SECTIONS: Record<string, string> = {
   docs: '## Docs',
 }
 
+const DEV_REGEX = /^\w+\(dev\)[!:]?/
+
 async function getAllCommits(range: string): Promise<string[]> {
   const { stdout } = await getExecOutput(
     'git',
@@ -64,8 +66,6 @@ async function run(): Promise<void> {
     const sections: string[] = []
     let totalCommits = 0
 
-    const DEV_REGEX = /^\w+\(dev\)[!:]?/
-
     for (const [type, header] of Object.entries(SECTIONS)) {
       const typeRegex = new RegExp(`^${type}(\\([^)]*\\))?!?: `)
 
@@ -88,7 +88,7 @@ async function run(): Promise<void> {
     if (outputFile) {
       const resolvedPath = path.resolve(outputFile)
 
-      if (!resolvedPath.startsWith(workspacePath)) {
+      if (resolvedPath !== workspacePath && !resolvedPath.startsWith(workspacePath + path.sep)) {
         throw new Error(`Output file path must be within the workspace: ${outputFile}`)
       }
 
