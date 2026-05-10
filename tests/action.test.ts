@@ -277,7 +277,7 @@ withTempDir('Path traversal attempt', (dir, githubOutput) => {
       GITHUB_OUTPUT: githubOutput,
     })
     assert(false, 'Action should have failed for path traversal')
-  } catch (error) {
+  } catch {
     console.log('OK: Action failed as expected for path traversal')
   }
 })
@@ -295,7 +295,7 @@ withTempDir('Workspace root attempt', (dir, githubOutput) => {
       GITHUB_OUTPUT: githubOutput,
     })
     assert(false, 'Action should have failed for workspace root')
-  } catch (error) {
+  } catch {
     console.log('OK: Action failed as expected for workspace root')
   }
 })
