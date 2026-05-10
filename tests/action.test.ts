@@ -427,4 +427,27 @@ withTempDir('Output file overwrite', (dir, githubOutput) => {
   assert(fileContent === changelog, 'File content matches changelog output', fileContent)
 })
 
+// 18. Floating tags (v1) should be ignored
+withTempDir('Floating tags', (dir, githubOutput) => {
+  commit(dir, 'feat: initial')
+  git(dir, 'tag v1.0.0')
+  git(dir, 'tag v1') // floating tag points to v1.0.0
+
+  commit(dir, 'feat: second')
+  git(dir, 'tag v1.1.0')
+  git(dir, 'tag -f v1 v1.1.0') // move v1 to v1.1.0
+
+  runAction(dir, {
+    INPUT_TAG: 'v1.1.0',
+    GITHUB_WORKSPACE: dir,
+    GITHUB_OUTPUT: githubOutput,
+  })
+
+  const outputs = parseGithubOutput(fs.readFileSync(githubOutput, 'utf8'))
+  const changelog = outputs['changelog'] || ''
+
+  // Should find v1.0.0 as previous tag, not fail or find itself via v1
+  assert(changelog.includes('Second'), 'Changelog found the correct commit')
+})
+
 console.log('\nAll tests passed!')
