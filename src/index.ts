@@ -54,7 +54,18 @@ async function resolveTagRange(tag: string): Promise<string> {
   try {
     const { stdout } = await getExecOutput(
       'git',
-      ['describe', '--tags', '--abbrev=0', '--exclude', tag, '--exclude', 'v[0-9]', '--exclude', 'v[0-9][0-9]', tag],
+      [
+        'describe',
+        '--tags',
+        '--abbrev=0',
+        '--exclude',
+        tag,
+        '--exclude',
+        'v[0-9]',
+        '--exclude',
+        'v[0-9][0-9]',
+        tag,
+      ],
       { silent: true }
     )
     prevTag = stdout.trim()
