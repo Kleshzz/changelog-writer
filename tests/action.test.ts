@@ -6,7 +6,7 @@ import { git, commit, parseGithubOutput, assert, runAction } from './helpers'
 /**
  * Helper to run a test in a temporary directory and ensure cleanup.
  */
-function withTempDir(testName: string, fn: (dir: string, githubOutput: string) => void) {
+function withTempDir(testName: string, fn: (dir: string, githubOutput: string) => void): void {
   console.log(`\n--- Running test: ${testName} ---`)
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'changelog-test-'))
   const githubOutput = path.join(dir, 'github_output')
@@ -171,7 +171,7 @@ withTempDir('Non-existent tag', (dir, githubOutput) => {
       GITHUB_OUTPUT: githubOutput,
     })
     assert(false, 'Action should have failed for non-existent tag')
-  } catch (e) {
+  } catch {
     console.log('OK: Action failed as expected for non-existent tag')
   }
 

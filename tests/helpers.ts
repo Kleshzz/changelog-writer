@@ -1,5 +1,4 @@
 import { execSync } from 'child_process'
-import * as fs from 'fs'
 import * as path from 'path'
 
 export function git(dir: string, cmd: string): void {
@@ -47,6 +46,6 @@ export function runAction(dir: string, env: Record<string, string>): void {
   execSync(`node ${actionPath}`, {
     cwd: dir,
     env: { ...process.env, ...env },
-    stdio: ['ignore', 'inherit', 'inherit']
+    stdio: ['ignore', 'inherit', 'inherit'],
   })
 }

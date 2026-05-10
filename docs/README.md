@@ -3,7 +3,6 @@
 ![CI](https://github.com/Kleshzz/changelog-writer/actions/workflows/ci.yml/badge.svg)
 ![Latest Release](https://img.shields.io/github/v/release/Kleshzz/changelog-writer)
 
-
 GitHub Action that generates a changelog from conventional commits between tags.
 
 ## Usage
@@ -56,7 +55,6 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 - `fix!: breaking change in API` — Breaking change (adds ⚠️)
 - `feat(dev): update dependencies` — Excluded from changelog via `(dev)` scope
 
-
 ## Example output
 
 ### Features
@@ -72,7 +70,6 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 
 - **No matching commits**: If no commits match the supported types between tags, the output will be `No changes`.
 - **Tag not found**: If the specified `tag` (or the previous tag) cannot be found, the action will fail.
-
 
 ## Local Development
 
