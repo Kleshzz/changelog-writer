@@ -68,7 +68,7 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 
 ## Behavior & Edge Cases
 
-- **No matching commits**: If no commits match the supported types between tags, the output will be `No changes`.
+- **No matching commits**: If no commits match the supported types between tags, the output will be `No changes.`.
 - **Tag not found**: If the specified `tag` (or the previous tag) cannot be found, the action will fail.
 
 ## Local Development
