@@ -79,6 +79,7 @@ withTempDir('Breaking change', (dir, githubOutput) => {
   git(dir, 'tag v1.0.0')
   commit(dir, 'feat!: remove legacy API')
   commit(dir, 'fix!: change config format')
+  commit(dir, 'feat: add new thing') // обычный feat — не должен попасть в Breaking
   git(dir, 'tag v1.1.0')
 
   runAction(dir, {
@@ -90,9 +91,23 @@ withTempDir('Breaking change', (dir, githubOutput) => {
   const outputs = parseGithubOutput(fs.readFileSync(githubOutput, 'utf8'))
   const changelog = outputs['changelog'] || ''
 
-  assert(changelog.includes('## Features'), 'Features section present', changelog)
+  assert(changelog.includes('## Breaking Changes'), 'Breaking Changes section present', changelog)
   assert(changelog.includes('Remove legacy API'), 'Breaking feat included', changelog)
   assert(changelog.includes('Change config format'), 'Breaking fix included', changelog)
+  assert(changelog.includes('## Features'), 'Features section present', changelog)
+  assert(changelog.includes('Add new thing'), 'Regular feat included', changelog)
+  // Breaking Changes должен быть выше Features
+  assert(
+    changelog.indexOf('## Breaking Changes') < changelog.indexOf('## Features'),
+    'Breaking Changes before Features',
+    changelog
+  )
+  // feat! не должен дублироваться в Features
+  assert(
+    !changelog.replace('## Breaking Changes', '').includes('Remove legacy API\nRemove legacy API'),
+    'No duplicates',
+    changelog
+  )
 })
 
 // 3. Commits with scope

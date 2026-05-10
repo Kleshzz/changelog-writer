@@ -19,6 +19,8 @@ const SECTION_ENTRIES = Object.entries(SECTIONS).map(([type, header]) => ({
   regex: new RegExp(`^${type}(\\([^)]*\\))?!?: `),
 }))
 
+const BREAKING_REGEX = /^(feat|fix|perf|refactor|style|docs)(\([^)]*\))?!: /
+
 async function getAllCommits(range: string): Promise<string[]> {
   const { stdout } = await getExecOutput(
     'git',
@@ -74,9 +76,24 @@ function generateChangelog(allCommits: string[]): {
   const sections: string[] = []
   let totalCommits = 0
 
+  // Breaking changes first
+  const breakingLines = allCommits.reduce<string[]>((acc, line) => {
+    if (BREAKING_REGEX.test(line) && !DEV_REGEX.test(line)) {
+      const cleaned = line.replace(BREAKING_REGEX, '')
+      acc.push('- ' + cleaned.charAt(0).toUpperCase() + cleaned.slice(1))
+    }
+    return acc
+  }, [])
+
+  if (breakingLines.length > 0) {
+    totalCommits += breakingLines.length
+    sections.push(`## Breaking Changes\n${breakingLines.join('\n')}`)
+  }
+
+  // Regular sections
   for (const { header, regex } of SECTION_ENTRIES) {
     const lines = allCommits.reduce<string[]>((acc, line) => {
-      if (regex.test(line) && !DEV_REGEX.test(line)) {
+      if (regex.test(line) && !DEV_REGEX.test(line) && !BREAKING_REGEX.test(line)) {
         const cleaned = line.replace(regex, '')
         acc.push('- ' + cleaned.charAt(0).toUpperCase() + cleaned.slice(1))
       }
