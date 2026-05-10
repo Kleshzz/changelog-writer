@@ -16,7 +16,7 @@ GitHub Action that generates a changelog from conventional commits between tags.
   id: changelog
   with:
     tag: ${{ github.ref_name }} # required for generated changelog
-    output-file: changelog.md # optional
+    output_file: changelog.md # optional
 
 - name: Create release
   run: echo "${{ steps.changelog.outputs.changelog }}"
@@ -27,7 +27,7 @@ GitHub Action that generates a changelog from conventional commits between tags.
 | Name          | Required | Description                          |
 | ------------- | -------- | ------------------------------------ |
 | `tag`         | ✅       | Target tag to generate changelog for |
-| `output-file` |          | Path to write changelog file         |
+| `output_file` |          | Path to write changelog file         |
 
 ## Outputs
 
