@@ -48,7 +48,7 @@ ${n}`;break;case"retry":ku(n)&&(t[s]=n);break;case"id":Ru(n)&&(t[s]=n);break;cas
 ${i.join(`
 `)}`))}return{changelog:A.length>0?A.join(`
 
-`):"No changes.",totalCommits:t,sectionsCount:A.length}}async function rU(){let e=Et.resolve(process.env.GITHUB_WORKSPACE??process.cwd());try{let A=ng("tag",{required:!0}),t=await eU(A),r=await AU(t),{changelog:s,totalCommits:n,sectionsCount:i}=tU(r),o=ng("output_file");if(o){let a=Et.resolve(o);if(a!==e&&!a.startsWith(e+Et.sep))throw new Error(`Output file path must be within the workspace: ${o}`);fi.mkdirSync(Et.dirname(a),{recursive:!0}),fi.writeFileSync(a,s)}di("Changelog generated successfully"),di(`Range: ${t}`),di(`Sections: ${i}, commits processed: ${n}`),rd("changelog",s)}catch(A){sd(A instanceof Error?A.message:String(A))}}rU();
+`):"No changes.",totalCommits:t,sectionsCount:A.length}}async function rU(){let e=Et.resolve(process.env.GITHUB_WORKSPACE??process.cwd());try{let A=ng("tag",{required:!0}),t=await eU(A),r=await AU(t),{changelog:s,totalCommits:n,sectionsCount:i}=tU(r),o=ng("output_file");if(o){let a=Et.resolve(o);if(!a.startsWith(e+Et.sep))throw new Error(`Output file path must be within the workspace: ${o}`);fi.mkdirSync(Et.dirname(a),{recursive:!0}),fi.writeFileSync(a,s)}di("Changelog generated successfully"),di(`Range: ${t}`),di(`Sections: ${i}, commits processed: ${n}`),rd("changelog",s)}catch(A){sd(A instanceof Error?A.message:String(A))}}rU();
 /*! Bundled license information:
 
 undici/lib/web/fetch/body.js:

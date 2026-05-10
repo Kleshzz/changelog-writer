@@ -101,7 +101,7 @@ async function run(): Promise<void> {
     if (outputFile) {
       const resolvedPath = path.resolve(outputFile)
 
-      if (resolvedPath !== workspacePath && !resolvedPath.startsWith(workspacePath + path.sep)) {
+      if (!resolvedPath.startsWith(workspacePath + path.sep)) {
         throw new Error(`Output file path must be within the workspace: ${outputFile}`)
       }
 
