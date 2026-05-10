@@ -240,7 +240,11 @@ withTempDir('Whitespace-only output-file', (dir, githubOutput) => {
   // If it wasn't ignored, it might have tried to write to a weird path and failed
   // or we can check that no files were created except the expected ones
   const files = fs.readdirSync(dir).filter((f) => f !== '.git' && f !== 'github_output')
-  assert(files.length === 0, 'No output file should be created for whitespace-only input', files.join(', '))
+  assert(
+    files.length === 0,
+    'No output file should be created for whitespace-only input',
+    files.join(', ')
+  )
 })
 
 // 10. Tag with whitespace (should be trimmed)
@@ -258,6 +262,42 @@ withTempDir('Tag with whitespace', (dir, githubOutput) => {
   const changelog = outputs['changelog'] || ''
 
   assert(changelog.includes('Some feat'), 'Changelog generated for trimmed tag')
+})
+
+// 11. Path traversal attempt (should fail)
+withTempDir('Path traversal attempt', (dir, githubOutput) => {
+  commit(dir, 'feat: some feat')
+  git(dir, 'tag v1.0.0')
+
+  try {
+    runAction(dir, {
+      INPUT_TAG: 'v1.0.0',
+      INPUT_OUTPUT_FILE: '../outside.md',
+      GITHUB_WORKSPACE: dir,
+      GITHUB_OUTPUT: githubOutput,
+    })
+    assert(false, 'Action should have failed for path traversal')
+  } catch (error) {
+    console.log('OK: Action failed as expected for path traversal')
+  }
+})
+
+// 12. Workspace root attempt (should fail)
+withTempDir('Workspace root attempt', (dir, githubOutput) => {
+  commit(dir, 'feat: some feat')
+  git(dir, 'tag v1.0.0')
+
+  try {
+    runAction(dir, {
+      INPUT_TAG: 'v1.0.0',
+      INPUT_OUTPUT_FILE: '.',
+      GITHUB_WORKSPACE: dir,
+      GITHUB_OUTPUT: githubOutput,
+    })
+    assert(false, 'Action should have failed for workspace root')
+  } catch (error) {
+    console.log('OK: Action failed as expected for workspace root')
+  }
 })
 
 console.log('\nAll tests passed!')
