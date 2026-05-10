@@ -427,7 +427,7 @@ withTempDir('Output file overwrite', (dir, githubOutput) => {
   assert(fileContent === changelog, 'File content matches changelog output', fileContent)
 })
 
-// 18. Floating tags (v1) should be ignored
+// 18. Floating tags (v1, v10, v2-beta) should be ignored
 withTempDir('Floating tags', (dir, githubOutput) => {
   commit(dir, 'feat: initial')
   git(dir, 'tag v1.0.0')
@@ -436,6 +436,8 @@ withTempDir('Floating tags', (dir, githubOutput) => {
   commit(dir, 'feat: second')
   git(dir, 'tag v1.1.0')
   git(dir, 'tag -f v1 v1.1.0') // move v1 to v1.1.0
+  git(dir, 'tag v10 v1.1.0') // add multi-digit floating tag
+  git(dir, 'tag v2-beta v1.1.0') // add non-versioned tag
 
   runAction(dir, {
     INPUT_TAG: 'v1.1.0',
@@ -446,7 +448,7 @@ withTempDir('Floating tags', (dir, githubOutput) => {
   const outputs = parseGithubOutput(fs.readFileSync(githubOutput, 'utf8'))
   const changelog = outputs['changelog'] || ''
 
-  // Should find v1.0.0 as previous tag, not fail or find itself via v1
+  // Should find v1.0.0 as previous tag, skipping v1, v10, and v2-beta
   assert(changelog.includes('Second'), 'Changelog found the correct commit')
 })
 

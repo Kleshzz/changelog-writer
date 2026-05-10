@@ -51,25 +51,27 @@ async function resolveTagRange(tag: string): Promise<string> {
   }
 
   let prevTag = ''
-  try {
-    const { stdout } = await getExecOutput(
-      'git',
-      [
-        'describe',
-        '--tags',
-        '--abbrev=0',
-        '--exclude',
-        tag,
-        '--exclude',
-        'v[0-9]',
-        '--exclude',
-        'v[0-9][0-9]',
-        tag,
-      ],
-      { silent: true }
-    )
-    prevTag = stdout.trim()
-  } catch {
+  const excludes = [tag]
+
+  while (true) {
+    try {
+      const { stdout } = await getExecOutput(
+        'git',
+        ['describe', '--tags', '--abbrev=0', ...excludes.flatMap((e) => ['--exclude', e]), tag],
+        { silent: true }
+      )
+      const found = stdout.trim()
+      if (found.includes('.')) {
+        prevTag = found
+        break
+      }
+      excludes.push(found)
+    } catch {
+      // No more tags to check
+      break
+    }
+  }
+  if (!prevTag) {
     core.warning(
       `No previous tag found before "${tag}". Falling back to full history. ` +
         'If this is a shallow clone, ensure you fetch all tags.'
