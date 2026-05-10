@@ -380,4 +380,51 @@ withTempDir('Duplicate commits', (dir, githubOutput) => {
   )
 })
 
+// 16. Absolute path outside workspace (should fail)
+withTempDir('Absolute path outside workspace', (dir, githubOutput) => {
+  commit(dir, 'feat: some feat')
+  git(dir, 'tag v1.0.0')
+
+  try {
+    runAction(dir, {
+      INPUT_TAG: 'v1.0.0',
+      INPUT_OUTPUT_FILE: '/tmp/evil.md',
+      GITHUB_WORKSPACE: dir,
+      GITHUB_OUTPUT: githubOutput,
+    })
+    assert(false, 'Action should have failed for absolute path outside workspace')
+  } catch {
+    console.log('OK: Action failed as expected for absolute path outside workspace')
+  } finally {
+    try {
+      fs.rmSync('/tmp/evil.md', { force: true })
+    } catch {}
+  }
+
+  assert(!fs.existsSync('/tmp/evil.md'), 'File should not have been created outside workspace')
+})
+
+// 17. Output file already exists (should overwrite)
+withTempDir('Output file overwrite', (dir, githubOutput) => {
+  commit(dir, 'feat: some feat')
+  git(dir, 'tag v1.0.0')
+
+  const outputFile = path.join(dir, 'CHANGELOG.md')
+  fs.writeFileSync(outputFile, 'old content')
+
+  runAction(dir, {
+    INPUT_TAG: 'v1.0.0',
+    INPUT_OUTPUT_FILE: outputFile,
+    GITHUB_WORKSPACE: dir,
+    GITHUB_OUTPUT: githubOutput,
+  })
+
+  const outputs = parseGithubOutput(fs.readFileSync(githubOutput, 'utf8'))
+  const changelog = outputs['changelog'] || ''
+
+  const fileContent = fs.readFileSync(outputFile, 'utf8')
+  assert(fileContent !== 'old content', 'Old content should be overwritten', fileContent)
+  assert(fileContent === changelog, 'File content matches changelog output', fileContent)
+})
+
 console.log('\nAll tests passed!')
