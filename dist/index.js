@@ -48,7 +48,7 @@ ${n}`;break;case"retry":Ru(n)&&(t[s]=n);break;case"id":Fu(n)&&(t[s]=n);break;cas
 ${E.join(`
 `)}`))}let i=s.length>0?s.join(`
 
-`):"No changes.",o=ng("output-file");if(o){let a=Bs.resolve(o),c=process.env.GITHUB_WORKSPACE||process.cwd();if(!a.startsWith(Bs.resolve(c)))throw new Error(`Output file path must be within the workspace: ${o}`);fi.mkdirSync(Bs.dirname(a),{recursive:!0}),fi.writeFileSync(a,i)}sd("changelog",i),di("Changelog generated successfully"),di(`Range: ${t}`),di(`Sections: ${s.length}, commits processed: ${n}`)}catch(e){ig(e instanceof Error?e.message:String(e))}}AU();
+`):"No changes.",o=ng("output_file");if(o){let a=Bs.resolve(o),c=process.env.GITHUB_WORKSPACE||process.cwd();if(!a.startsWith(Bs.resolve(c)))throw new Error(`Output file path must be within the workspace: ${o}`);fi.mkdirSync(Bs.dirname(a),{recursive:!0}),fi.writeFileSync(a,i)}sd("changelog",i),di("Changelog generated successfully"),di(`Range: ${t}`),di(`Sections: ${s.length}, commits processed: ${n}`)}catch(e){ig(e instanceof Error?e.message:String(e))}}AU();
 /*! Bundled license information:
 
 undici/lib/web/fetch/body.js:

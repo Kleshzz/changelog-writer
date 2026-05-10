@@ -43,9 +43,13 @@ export function assert(cond: boolean, msg: string, context?: string): void {
 
 export function runAction(dir: string, env: Record<string, string>): void {
   const actionPath = path.join(__dirname, '../dist/index.js')
+  // Normalize keys: replace hyphens with underscores as some environments have trouble with hyphenated env vars
+  const normalizedEnv = Object.fromEntries(
+    Object.entries(env).map(([k, v]) => [k.replace(/-/g, '_'), v])
+  )
   execSync(`node ${actionPath}`, {
     cwd: dir,
-    env: { ...process.env, ...env },
-    stdio: ['ignore', 'inherit', 'inherit'],
+    env: { ...process.env, ...normalizedEnv },
+    stdio: ['ignore', 'inherit', 'inherit']
   })
 }

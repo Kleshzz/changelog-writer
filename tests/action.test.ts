@@ -190,7 +190,7 @@ withTempDir('Write to output-file', (dir, githubOutput) => {
 
   runAction(dir, {
     INPUT_TAG: 'v1.0.0',
-    'INPUT_OUTPUT-FILE': outputFile,
+    'INPUT_OUTPUT_FILE': outputFile,
     GITHUB_WORKSPACE: dir,
     GITHUB_OUTPUT: githubOutput,
   })

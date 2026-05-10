@@ -82,7 +82,7 @@ async function run(): Promise<void> {
 
     const changelog = sections.length > 0 ? sections.join('\n\n') : 'No changes.'
 
-    const outputFile = core.getInput('output-file')
+    const outputFile = core.getInput('output_file')
     if (outputFile) {
       const resolvedPath = path.resolve(outputFile)
       const workspacePath = process.env['GITHUB_WORKSPACE'] || process.cwd()
