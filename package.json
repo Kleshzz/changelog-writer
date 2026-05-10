@@ -19,7 +19,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "npm run build && npx -y ts-node tests/action.test.ts",
+    "test": "npm run build && ts-node tests/action.test.ts",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm run test"
   },
   "dependencies": {
@@ -30,9 +30,10 @@
     "@types/node": "^25",
     "@typescript-eslint/eslint-plugin": "^8",
     "@typescript-eslint/parser": "^8",
-    "eslint": "^10",
     "esbuild": "^0.28.0",
+    "eslint": "^10",
     "prettier": "^3",
+    "ts-node": "^10.9.2",
     "typescript": "^6"
   }
 }
