@@ -29,10 +29,11 @@ async function getAllCommits(range: string): Promise<string[]> {
     { silent: true }
   )
 
-  return stdout
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean)
+  return stdout.split('\n').reduce<string[]>((acc, line) => {
+    const trimmed = line.trim()
+    if (trimmed) acc.push(trimmed)
+    return acc
+  }, [])
 }
 
 async function resolveTagRange(tag: string): Promise<string> {
@@ -71,12 +72,13 @@ function generateChangelog(allCommits: string[]): {
   for (const [type, header] of Object.entries(SECTIONS)) {
     const typeRegex = new RegExp(`^${type}(\\([^)]*\\))?!?: `)
 
-    const lines = allCommits
-      .filter((line) => typeRegex.test(line) && !DEV_REGEX.test(line))
-      .map((line) => {
+    const lines = allCommits.reduce<string[]>((acc, line) => {
+      if (typeRegex.test(line) && !DEV_REGEX.test(line)) {
         const cleaned = line.replace(typeRegex, '')
-        return '- ' + cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
-      })
+        acc.push('- ' + cleaned.charAt(0).toUpperCase() + cleaned.slice(1))
+      }
+      return acc
+    }, [])
 
     if (lines.length > 0) {
       totalCommits += lines.length
