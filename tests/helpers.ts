@@ -50,6 +50,6 @@ export function runAction(dir: string, env: Record<string, string>): void {
   execSync(`node ${actionPath}`, {
     cwd: dir,
     env: { ...process.env, ...normalizedEnv },
-    stdio: ['ignore', 'inherit', 'inherit']
+    stdio: ['ignore', 'inherit', 'inherit'],
   })
 }
