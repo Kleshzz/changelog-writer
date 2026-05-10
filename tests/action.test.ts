@@ -452,4 +452,23 @@ withTempDir('Floating tags', (dir, githubOutput) => {
   assert(changelog.includes('Second'), 'Changelog found the correct commit')
 })
 
+// 19. Output file with spaces in path
+withTempDir('Output file with spaces', (dir, githubOutput) => {
+  commit(dir, 'feat: some feat')
+  git(dir, 'tag v1.0.0')
+
+  const outputFile = path.join(dir, 'my changelog folder', 'CHANGELOG.md')
+
+  runAction(dir, {
+    INPUT_TAG: 'v1.0.0',
+    INPUT_OUTPUT_FILE: outputFile,
+    GITHUB_WORKSPACE: dir,
+    GITHUB_OUTPUT: githubOutput,
+  })
+
+  assert(fs.existsSync(outputFile), 'Output file with spaces created')
+  const fileContent = fs.readFileSync(outputFile, 'utf8')
+  assert(fileContent.includes('Some feat'), 'Content is correct')
+})
+
 console.log('\nAll tests passed!')
