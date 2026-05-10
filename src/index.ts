@@ -35,54 +35,67 @@ async function getAllCommits(range: string): Promise<string[]> {
     .filter(Boolean)
 }
 
+async function resolveTagRange(tag: string): Promise<string> {
+  try {
+    await getExecOutput('git', ['rev-parse', '--verify', tag], { silent: true })
+  } catch {
+    throw new Error(`Tag "${tag}" not found in repository`)
+  }
+
+  let prevTag = ''
+  try {
+    const { stdout } = await getExecOutput(
+      'git',
+      ['describe', '--tags', '--abbrev=0', '--exclude', tag, tag],
+      { silent: true }
+    )
+    prevTag = stdout.trim()
+  } catch (error) {
+    core.debug(`No previous tag found, using full history: ${error}`)
+  }
+
+  return prevTag ? `${prevTag}..${tag}` : tag
+}
+
+function generateChangelog(allCommits: string[]): {
+  changelog: string
+  totalCommits: number
+  sectionsCount: number
+} {
+  const sections: string[] = []
+  let totalCommits = 0
+
+  for (const [type, header] of Object.entries(SECTIONS)) {
+    const typeRegex = new RegExp(`^${type}(\\([^)]*\\))?!?: `)
+
+    const lines = allCommits
+      .filter((line) => typeRegex.test(line) && !DEV_REGEX.test(line))
+      .map((line) => {
+        const cleaned = line.replace(typeRegex, '')
+        return '- ' + cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
+      })
+
+    if (lines.length > 0) {
+      totalCommits += lines.length
+      sections.push(`${header}\n${lines.join('\n')}`)
+    }
+  }
+
+  return {
+    changelog: sections.length > 0 ? sections.join('\n\n') : 'No changes.',
+    totalCommits,
+    sectionsCount: sections.length,
+  }
+}
+
 async function run(): Promise<void> {
   const workspacePath = path.resolve(process.env['GITHUB_WORKSPACE'] ?? process.cwd())
   try {
     const tag = core.getInput('tag', { required: true })
-
-    try {
-      await getExecOutput('git', ['rev-parse', '--verify', tag], { silent: true })
-    } catch {
-      core.setFailed(`Tag "${tag}" not found in repository`)
-      return
-    }
-
-    let prevTag = ''
-    try {
-      const { stdout } = await getExecOutput(
-        'git',
-        ['describe', '--tags', '--abbrev=0', '--exclude', tag, tag],
-        { silent: true }
-      )
-      prevTag = stdout.trim()
-    } catch (error) {
-      core.debug(`No previous tag found, using full history: ${error}`)
-    }
-
-    // If no previous tag found, git log <tag> will show all history up to that tag
-    const range = prevTag ? `${prevTag}..${tag}` : tag
+    const range = await resolveTagRange(tag)
     const allCommits = await getAllCommits(range)
 
-    const sections: string[] = []
-    let totalCommits = 0
-
-    for (const [type, header] of Object.entries(SECTIONS)) {
-      const typeRegex = new RegExp(`^${type}(\\([^)]*\\))?!?: `)
-
-      const lines = allCommits
-        .filter((line) => typeRegex.test(line) && !DEV_REGEX.test(line))
-        .map((line) => {
-          const cleaned = line.replace(typeRegex, '')
-          return '- ' + cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
-        })
-
-      if (lines.length > 0) {
-        totalCommits += lines.length
-        sections.push(`${header}\n${lines.join('\n')}`)
-      }
-    }
-
-    const changelog = sections.length > 0 ? sections.join('\n\n') : 'No changes.'
+    const { changelog, totalCommits, sectionsCount } = generateChangelog(allCommits)
 
     const outputFile = core.getInput('output_file')
     if (outputFile) {
@@ -96,11 +109,11 @@ async function run(): Promise<void> {
       fs.writeFileSync(resolvedPath, changelog)
     }
 
-    core.setOutput('changelog', changelog)
-
     core.info('Changelog generated successfully')
     core.info(`Range: ${range}`)
-    core.info(`Sections: ${sections.length}, commits processed: ${totalCommits}`)
+    core.info(`Sections: ${sectionsCount}, commits processed: ${totalCommits}`)
+
+    core.setOutput('changelog', changelog)
   } catch (error) {
     core.setFailed(error instanceof Error ? error.message : String(error))
   }
