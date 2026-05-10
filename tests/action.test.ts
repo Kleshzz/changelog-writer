@@ -385,10 +385,12 @@ withTempDir('Absolute path outside workspace', (dir, githubOutput) => {
   commit(dir, 'feat: some feat')
   git(dir, 'tag v1.0.0')
 
+  const outsideFile = path.join(os.tmpdir(), `evil-${Math.random().toString(36).slice(2)}.md`)
+
   try {
     runAction(dir, {
       INPUT_TAG: 'v1.0.0',
-      INPUT_OUTPUT_FILE: '/tmp/evil.md',
+      INPUT_OUTPUT_FILE: outsideFile,
       GITHUB_WORKSPACE: dir,
       GITHUB_OUTPUT: githubOutput,
     })
@@ -397,11 +399,11 @@ withTempDir('Absolute path outside workspace', (dir, githubOutput) => {
     console.log('OK: Action failed as expected for absolute path outside workspace')
   } finally {
     try {
-      fs.rmSync('/tmp/evil.md', { force: true })
+      fs.rmSync(outsideFile, { force: true })
     } catch {}
   }
 
-  assert(!fs.existsSync('/tmp/evil.md'), 'File should not have been created outside workspace')
+  assert(!fs.existsSync(outsideFile), 'File should not have been created outside workspace')
 })
 
 // 17. Output file already exists (should overwrite)
