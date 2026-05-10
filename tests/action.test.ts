@@ -79,7 +79,7 @@ withTempDir('Breaking change', (dir, githubOutput) => {
   git(dir, 'tag v1.0.0')
   commit(dir, 'feat!: remove legacy API')
   commit(dir, 'fix!: change config format')
-  commit(dir, 'feat: add new thing') // обычный feat — не должен попасть в Breaking
+  commit(dir, 'feat: add new thing') // regular feat - should not be included in Breaking
   git(dir, 'tag v1.1.0')
 
   runAction(dir, {
@@ -96,13 +96,13 @@ withTempDir('Breaking change', (dir, githubOutput) => {
   assert(changelog.includes('Change config format'), 'Breaking fix included', changelog)
   assert(changelog.includes('## Features'), 'Features section present', changelog)
   assert(changelog.includes('Add new thing'), 'Regular feat included', changelog)
-  // Breaking Changes должен быть выше Features
+  // Breaking Changes should be above Features
   assert(
     changelog.indexOf('## Breaking Changes') < changelog.indexOf('## Features'),
     'Breaking Changes before Features',
     changelog
   )
-  // feat! не должен дублироваться в Features
+  // feat! should not be duplicated in Features
   assert(
     !changelog.replace('## Breaking Changes', '').includes('Remove legacy API\nRemove legacy API'),
     'No duplicates',
@@ -313,6 +313,71 @@ withTempDir('Workspace root attempt', (dir, githubOutput) => {
   } catch {
     console.log('OK: Action failed as expected for workspace root')
   }
+})
+
+// 13. Breaking change with scope
+withTempDir('Breaking change with scope', (dir, githubOutput) => {
+  commit(dir, 'chore: init')
+  git(dir, 'tag v1.0.0')
+  commit(dir, 'feat(api)!: drop v1 endpoints')
+  git(dir, 'tag v1.1.0')
+
+  runAction(dir, {
+    INPUT_TAG: 'v1.1.0',
+    GITHUB_WORKSPACE: dir,
+    GITHUB_OUTPUT: githubOutput,
+  })
+
+  const outputs = parseGithubOutput(fs.readFileSync(githubOutput, 'utf8'))
+  const changelog = outputs['changelog'] || ''
+
+  assert(changelog.includes('## Breaking Changes'), 'Breaking Changes section present', changelog)
+  assert(changelog.includes('Drop v1 endpoints'), 'Breaking feat with scope included', changelog)
+  assert(!changelog.includes('## Features'), 'Features section should be absent', changelog)
+})
+
+// 14. Breaking change (dev) scope - should be filtered out
+withTempDir('Breaking change (dev) scope', (dir, githubOutput) => {
+  commit(dir, 'chore: init')
+  git(dir, 'tag v1.0.0')
+  commit(dir, 'feat(dev)!: internal breaking')
+  git(dir, 'tag v1.1.0')
+
+  runAction(dir, {
+    INPUT_TAG: 'v1.1.0',
+    GITHUB_WORKSPACE: dir,
+    GITHUB_OUTPUT: githubOutput,
+  })
+
+  const outputs = parseGithubOutput(fs.readFileSync(githubOutput, 'utf8'))
+  const changelog = outputs['changelog'] || ''
+
+  assert(changelog === 'No changes.', 'Output should be No changes.', changelog)
+})
+
+// 15. Duplicate commits (same message twice)
+withTempDir('Duplicate commits', (dir, githubOutput) => {
+  commit(dir, 'chore: init')
+  git(dir, 'tag v1.0.0')
+  commit(dir, 'feat: add button')
+  commit(dir, 'feat: add button') // both should be present - this is valid
+  git(dir, 'tag v1.1.0')
+
+  runAction(dir, {
+    INPUT_TAG: 'v1.1.0',
+    GITHUB_WORKSPACE: dir,
+    GITHUB_OUTPUT: githubOutput,
+  })
+
+  const outputs = parseGithubOutput(fs.readFileSync(githubOutput, 'utf8'))
+  const changelog = outputs['changelog'] || ''
+
+  assert(changelog.includes('## Features'), 'Features section present', changelog)
+  assert(
+    changelog.match(/- Add button/g)?.length === 2,
+    'Both duplicate commits are included',
+    changelog
+  )
 })
 
 console.log('\nAll tests passed!')
