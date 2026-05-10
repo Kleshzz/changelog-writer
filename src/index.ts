@@ -34,6 +34,7 @@ async function getAllCommits(range: string): Promise<string[]> {
 }
 
 async function run(): Promise<void> {
+  const workspacePath = path.resolve(process.env['GITHUB_WORKSPACE'] ?? process.cwd())
   try {
     const tag = core.getInput('tag', { required: true })
 
@@ -63,12 +64,13 @@ async function run(): Promise<void> {
     const sections: string[] = []
     let totalCommits = 0
 
+    const DEV_REGEX = /^\w+\(dev\)[!:]?/
+
     for (const [type, header] of Object.entries(SECTIONS)) {
       const typeRegex = new RegExp(`^${type}(\\([^)]*\\))?!?: `)
-      const devRegex = new RegExp(`^${type}\\(dev\\)[!:]?`)
 
       const lines = allCommits
-        .filter((line) => typeRegex.test(line) && !devRegex.test(line))
+        .filter((line) => typeRegex.test(line) && !DEV_REGEX.test(line))
         .map((line) => {
           const cleaned = line.replace(typeRegex, '')
           return '- ' + cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
@@ -85,9 +87,8 @@ async function run(): Promise<void> {
     const outputFile = core.getInput('output_file')
     if (outputFile) {
       const resolvedPath = path.resolve(outputFile)
-      const workspacePath = process.env['GITHUB_WORKSPACE'] || process.cwd()
 
-      if (!resolvedPath.startsWith(path.resolve(workspacePath))) {
+      if (!resolvedPath.startsWith(workspacePath)) {
         throw new Error(`Output file path must be within the workspace: ${outputFile}`)
       }
 
