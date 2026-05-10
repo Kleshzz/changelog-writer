@@ -50,8 +50,11 @@ async function resolveTagRange(tag: string): Promise<string> {
       { silent: true }
     )
     prevTag = stdout.trim()
-  } catch (error) {
-    core.debug(`No previous tag found, using full history: ${error}`)
+  } catch {
+    core.warning(
+      `No previous tag found before "${tag}". Falling back to full history. ` +
+        'If this is a shallow clone, ensure you fetch all tags.'
+    )
   }
 
   return prevTag ? `${prevTag}..${tag}` : tag
