@@ -48,7 +48,7 @@ async function run(): Promise<void> {
     try {
       const { stdout } = await getExecOutput(
         'git',
-        ['describe', '--tags', '--abbrev=0', `${tag}^`],
+        ['describe', '--tags', '--abbrev=0', '--exclude', tag, tag],
         { silent: true }
       )
       prevTag = stdout.trim()
