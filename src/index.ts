@@ -19,7 +19,7 @@ const SECTION_ENTRIES = Object.entries(SECTIONS).map(([type, header]) => ({
   regex: new RegExp(`^${type}(\\([^)]*\\))?!?: `),
 }))
 
-const BREAKING_REGEX = /^(feat|fix|perf|refactor|style|docs)(\([^)]*\))?!: /
+const BREAKING_REGEX = new RegExp(`^(${Object.keys(SECTIONS).join('|')})(\\([^)]*\\))?!: `)
 
 async function getAllCommits(range: string): Promise<string[]> {
   const { stdout } = await getExecOutput(
