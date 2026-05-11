@@ -14,13 +14,25 @@ export function parseGithubOutput(content: string): Record<string, string> {
   const lines = content.split('\n')
   let i = 0
   while (i < lines.length) {
-    const header = lines[i].match(/^(\w+)<<(.+)$/)
+    const line = lines[i]
+    if (!line) {
+      i++
+      continue
+    }
+    const header = line.match(/^(\w+)<<(.+)$/)
     if (header) {
       const [, key, delimiter] = header
+      if (!key || !delimiter) {
+        i++
+        continue
+      }
       const valueLines: string[] = []
       i++
       while (i < lines.length && lines[i] !== delimiter) {
-        valueLines.push(lines[i])
+        const valueLine = lines[i]
+        if (valueLine !== undefined) {
+          valueLines.push(valueLine)
+        }
         i++
       }
       result[key] = valueLines.join('\n')
