@@ -1,6 +1,7 @@
 * text=auto eol=lf
 
 *.md diff=markdown
+*.ts diff=typescript
 
 dist/** linguist-generated -diff
 package-lock.json linguist-generated -diff

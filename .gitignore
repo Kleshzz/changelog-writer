@@ -1,8 +1,21 @@
+# Build
+*.js.map
+*.tsbuildinfo
+.cache/
+
+# Deps
 node_modules/
+.npm
+.yarn
+
+# Tests
+coverage/
+*.lcov
 
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # IDE
 .vscode/
@@ -14,7 +27,11 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+logs/
+*.log
 
 # Environment
 .env
 .env.local
+.env.*.local
+.secrets
