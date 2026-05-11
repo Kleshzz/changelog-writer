@@ -138,13 +138,19 @@ async function run(): Promise<void> {
     const outputFile = core.getInput('output_file', { trimWhitespace: true })
     if (outputFile) {
       const resolvedPath = path.resolve(outputFile)
+      const realWorkspace = fs.realpathSync(workspacePath)
 
-      const rel = path.relative(workspacePath, resolvedPath)
-      if (rel.startsWith('..') || path.isAbsolute(rel) || !rel) {
+      // Create directory first so realpathSync can resolve it
+      fs.mkdirSync(path.dirname(resolvedPath), { recursive: true })
+      const realResolvedDir = fs.realpathSync(path.dirname(resolvedPath))
+
+      if (
+        !realResolvedDir.startsWith(realWorkspace + path.sep) &&
+        realResolvedDir !== realWorkspace
+      ) {
         throw new Error(`Output file path must be within the workspace: ${outputFile}`)
       }
 
-      fs.mkdirSync(path.dirname(resolvedPath), { recursive: true })
       fs.writeFileSync(resolvedPath, changelog)
     }
 

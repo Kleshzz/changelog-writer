@@ -473,4 +473,36 @@ withTempDir('Output file with spaces', (dir, githubOutput) => {
   assert(fileContent.includes('Some feat'), 'Content is correct')
 })
 
+// 19. Symlink bypass path traversal (should fail)
+withTempDir('Symlink bypass path traversal', (dir, githubOutput) => {
+  commit(dir, 'feat: some feat')
+  git(dir, 'tag v1.0.0')
+
+  const outsideDir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'evil-dir-')))
+  const symlinkPath = path.join(dir, 'evil-link')
+  fs.symlinkSync(outsideDir, symlinkPath)
+
+  const outputFile = path.join(symlinkPath, 'CHANGELOG.md')
+  const outsideFile = path.join(outsideDir, 'CHANGELOG.md')
+
+  try {
+    runAction(dir, {
+      INPUT_TAG: 'v1.0.0',
+      INPUT_OUTPUT_FILE: outputFile,
+      GITHUB_WORKSPACE: dir,
+      GITHUB_OUTPUT: githubOutput,
+    })
+    assert(false, 'Action should have failed for symlink pointing outside workspace')
+  } catch (e) {
+    console.log(
+      'OK: Action failed as expected for symlink bypass:',
+      e instanceof Error ? e.message : e
+    )
+  } finally {
+    fs.rmSync(outsideDir, { recursive: true, force: true })
+  }
+
+  assert(!fs.existsSync(outsideFile), 'File should not have been created via symlink')
+})
+
 console.log('\nAll tests passed!')
