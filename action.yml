@@ -10,9 +10,10 @@ inputs:
   output_file:
     description: 'Path to write changelog file (relative to workspace). Leading/trailing whitespace will be trimmed.'
     required: false
+    default: ''
 outputs:
   changelog:
-    description: 'Generated changelog'
+    description: 'Generated changelog markdown text'
     value: ${{ steps.generate.outputs.changelog }}
 runs:
   using: 'node20'
