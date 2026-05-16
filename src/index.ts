@@ -20,6 +20,7 @@ const SECTION_ENTRIES = Object.entries(SECTIONS).map(([type, header]) => ({
 }))
 
 const BREAKING_REGEX = new RegExp(`^(${Object.keys(SECTIONS).join('|')})(\\([^)]*\\))?!: `)
+const capitalize = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1)
 
 async function getAllCommits(range: string): Promise<string[]> {
   const { stdout } = await getExecOutput(
@@ -93,7 +94,7 @@ function generateChangelog(allCommits: string[]): {
   const breakingLines = allCommits.reduce<string[]>((acc, line) => {
     if (BREAKING_REGEX.test(line) && !DEV_REGEX.test(line)) {
       const cleaned = line.replace(BREAKING_REGEX, '')
-      acc.push('- ' + cleaned.charAt(0).toUpperCase() + cleaned.slice(1))
+      acc.push('- ' + capitalize(cleaned))
     }
     return acc
   }, [])
@@ -108,7 +109,7 @@ function generateChangelog(allCommits: string[]): {
     const lines = allCommits.reduce<string[]>((acc, line) => {
       if (regex.test(line) && !DEV_REGEX.test(line) && !BREAKING_REGEX.test(line)) {
         const cleaned = line.replace(regex, '')
-        acc.push('- ' + cleaned.charAt(0).toUpperCase() + cleaned.slice(1))
+        acc.push('- ' + capitalize(cleaned))
       }
       return acc
     }, [])
