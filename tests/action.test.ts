@@ -473,7 +473,7 @@ withTempDir('Output file with spaces', (dir, githubOutput) => {
   assert(fileContent.includes('Some feat'), 'Content is correct')
 })
 
-// 19. Symlink bypass path traversal (should fail)
+// 20. Symlink bypass path traversal (should fail)
 withTempDir('Symlink bypass path traversal', (dir, githubOutput) => {
   commit(dir, 'feat: some feat')
   git(dir, 'tag v1.0.0')
