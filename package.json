@@ -27,13 +27,13 @@
     "@actions/exec": "^3.0.0"
   },
   "devDependencies": {
-    "@types/node": "^25",
+    "@types/node": "^26",
     "@typescript-eslint/eslint-plugin": "^8",
     "@typescript-eslint/parser": "^8",
     "esbuild": "^0.28.0",
     "eslint": "^10",
     "prettier": "^3",
     "ts-node": "^10.9.2",
-    "typescript": "^6"
+    "typescript": "^7"
   }
 }
